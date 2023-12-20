@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import './App.css'
 import { fetchNotes, addNotes } from './notesReducer'
 import { useDispatch, useSelector } from 'react-redux'
@@ -6,16 +7,26 @@ function App() {
   const dispatch = useDispatch()
   const notes = useSelector(state => state.notes.notes)
 
+  const [inputText, setInputText] = useState("")
+
+  useEffect(() => {
+    dispatch(fetchNotes())
+  }, [])
+
   return (
     <>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => dispatch(fetchNotes())}>
-          load notes
-        </button>
-        <button onClick={() => dispatch(addNotes())}>
-          Add note
-        </button>
+        <form onSubmit={(e) => {
+            e.preventDefault();
+            dispatch(addNotes(inputText))
+            setInputText("")
+          }}>
+          <input required={true} onChange={(e) => {
+            setInputText(e.target.value)
+          }} value={inputText} placeholder='dodaj notatke'/>
+          <button type='submit'>Add note</button>
+        </form>
         <p>
         </p>
       </div>

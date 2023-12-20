@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-export const addNotes = createAsyncThunk("notes/addNotes", async () => {
+const addNotesInternal = createAsyncThunk("notes/addNotes", async (inputText) => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer YOUR_API_TOKEN_HERE");
+    myHeaders.append("Authorization", "Bearer YOUR_API_TOKEN");
 
     const raw = JSON.stringify([
         {
-            "title": "My second task",
+            "title": inputText,
             "completed": false
         }
     ]);
@@ -20,13 +20,17 @@ export const addNotes = createAsyncThunk("notes/addNotes", async () => {
     };
 
     await fetch("https://crudapi.co.uk/api/v1/notes", requestOptions)
-
 })
+
+export const addNotes = (payload) => async (dispatch) => {
+    await dispatch(addNotesInternal(payload))
+    return await dispatch(fetchNotes())
+} 
 
 export const fetchNotes = createAsyncThunk("notes/fetchNotes", async () => {
     const myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/json");
-    myHeaders.append("Authorization", "Bearer YOUR_API_TOKEN_HERE");
+    myHeaders.append("Authorization", "Bearer YOUR_API_TOKEN");
 
     const requestOptions = {
         method: 'GET',
@@ -55,13 +59,13 @@ const notesSlice = createSlice({
         builder.addCase(fetchNotes.rejected, (state, action) => {
             state.loading = false
         })
-        builder.addCase(addNotes.pending, (state, action) => {
+        builder.addCase(addNotesInternal.pending, (state, action) => {
             state.loading = true
         })
-        builder.addCase(addNotes.fulfilled, (state, action) => {
+        builder.addCase(addNotesInternal.fulfilled, (state, action) => {
             state.loading = false
         })
-        builder.addCase(addNotes.rejected, (state, action) => {
+        builder.addCase(addNotesInternal.rejected, (state, action) => {
             state.loading = false
         })
     }
